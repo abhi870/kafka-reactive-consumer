@@ -1,0 +1,46 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.4'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id "com.github.davidmc24.gradle.plugin.avro" version "1.0.0"
+}
+
+group = 'com.reactorkafka'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	maven{
+		url("https://packages.confluent.io/maven/")
+	}
+}
+
+dependencies {
+
+	implementation("org.apache.avro:avro:1.10.1")
+
+	// https://mvnrepository.com/artifact/io.confluent/kafka-avro-serializer
+	implementation group: 'io.confluent', name: 'kafka-avro-serializer', version: '5.5.0'
+
+
+	implementation 'org.springframework.boot:spring-boot-starter'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
+	// https://mvnrepository.com/artifact/io.projectreactor.kafka/reactor-kafka
+	implementation 'io.projectreactor.kafka:reactor-kafka:1.3.5'
+//	implementation 'org.apache.avro:avro:1.10.1'
+
+}
+
+test {
+	useJUnitPlatform()
+}
