@@ -1,5 +1,6 @@
 package com.reactorkafka.consumer;
 
+import org.apache.avro.specific.SpecificRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,25 +13,17 @@ import reactor.core.publisher.Flux;
 public class ReactiveConsumerService implements CommandLineRunner {
     Logger log = LoggerFactory.getLogger(ReactiveConsumerService.class);
 
-    private final ReactiveKafkaConsumerTemplate<String, String> reactiveKafkaConsumerTemplate;
+    private final ReactiveKafkaConsumerTemplate<String, SpecificRecord> reactiveKafkaConsumerTemplate;
 
-    public ReactiveConsumerService(ReactiveKafkaConsumerTemplate<String, String> reactiveKafkaConsumerTemplate) {
+    public ReactiveConsumerService(ReactiveKafkaConsumerTemplate<String, SpecificRecord> reactiveKafkaConsumerTemplate) {
         this.reactiveKafkaConsumerTemplate = reactiveKafkaConsumerTemplate;
     }
 
-    private Flux<String> consumeFakeConsumerDTO() {
-        return reactiveKafkaConsumerTemplate
-                .receiveAutoAck()
-                // .delayElements(Duration.ofSeconds(2L)) // BACKPRESSURE
-                .doOnNext(consumerRecord -> log.info("received key={}, value={} from topic={}, offset={}",
-                        consumerRecord.key(),
-                        consumerRecord.value(),
-                        consumerRecord.topic(),
-                        consumerRecord.offset())
-                )
-                .map(ConsumerRecord::value)
-                .doOnNext(fakeConsumerDTO -> log.info("successfully consumed {}={}", String.class.getSimpleName(), fakeConsumerDTO))
-                .doOnError(throwable -> log.error("something bad happened while consuming : {}", throwable.getMessage()));
+    private Flux<ConsumerRecord<String, SpecificRecord>> consumeFakeConsumerDTO() {
+        return reactiveKafkaConsumerTemplate.receiveAutoAck()
+                .doOnNext(consumerRecord -> {
+                    log.info(consumerRecord.value().toString());
+                });
     }
 
     @Override
