@@ -22,13 +22,15 @@ public class ReactiveConsumerService implements CommandLineRunner {
     private Flux<ConsumerRecord<String, SpecificRecord>> consumeFakeConsumerDTO() {
         return reactiveKafkaConsumerTemplate.receiveAutoAck()
                 .doOnNext(consumerRecord -> {
-                    log.info(consumerRecord.value().toString());
+                    log.info(consumerRecord.value().toString() + " " + consumerRecord.key() + " " + consumerRecord.partition());
                 });
     }
 
     @Override
     public void run(String... args) {
         // we have to trigger consumption
+        System.out.println("begin....");
         consumeFakeConsumerDTO().subscribe();
+        System.out.println("end....");
     }
 }
